@@ -162,10 +162,14 @@ public class GraphMatching {
 		for (int i = 0; i < r; i++) {
 			sourceGraph = this.source.get(i);
 			for (int j = 0; j < c; j++) {
+				if (!(i == 0 && j == 1)) {
+					continue;
+				}
 				swapped = false;
 				targetGraph = this.target.get(j);
 				this.counter++;
-				System.out.print("\r"+counter+"/"+numOfMatchings+" ("+sourceGraph.size()+"vs"+targetGraph.size()+")    ");
+				// System.out.print("\r"+counter+"/"+numOfMatchings+" ("+sourceGraph.size()+"vs"+targetGraph.size()+")    ");
+				System.out.print("\r"+i+"/"+j+" ("+sourceGraph.size()+"vs"+targetGraph.size()+")    ");
 				// log the current graphs on the console
 				if (this.outputGraphs == 1) {
 					System.out.println("The Source Graph:");

@@ -256,15 +256,19 @@ public class EditDistance {
 		open.add(start);
 		
 		// time out handler
-		long MAX_TIME = 30000;
+		// long MAX_TIME = 300000;
+		long MAX_TIME = (long) Double.POSITIVE_INFINITY;
 		long sTime = System.currentTimeMillis();
 		long eTime = sTime+1;
 		
 		// the successors of a node
 		LinkedList<TreeNode> successors ;
 		
+		int lcnt = 0;
+		
 		// main loop of the tree search
-		while (!open.isEmpty()){	
+		while (!open.isEmpty()){
+			lcnt++;
 //			System.out.println("*** OPEN: \n"+open);
 			eTime = System.currentTimeMillis();
 			if (eTime-sTime > MAX_TIME){
@@ -272,6 +276,7 @@ public class EditDistance {
 			}
 			TreeNode u = open.pollFirst(); 
 			if (u.allNodesUsed()){
+				System.out.println("\nEnter loop count " + lcnt);
 				//u.printMatching();
 				return u.getCost();
 			}
