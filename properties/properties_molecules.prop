@@ -119,10 +119,10 @@ alpha=0.8
 #########################################################################################
 # 	logging options on the console							#
 #########################################################################################
-outputGraphs=0
-outputEditpath=0
-outputCostMatrix=0
-outputMatching=0
+outputGraphs=1
+outputEditpath=1
+outputCostMatrix=1
+outputMatching=1
 
 
 #########################################################################################

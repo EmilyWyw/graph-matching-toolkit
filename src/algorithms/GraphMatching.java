@@ -154,94 +154,100 @@ public class GraphMatching {
 		int numOfFails = 0;
 		// distance value d
 		double d = -1;
+		// loop count for astar and beam
+		int lcnt = -1;
 
 
 		// swapped the graphs?
 		boolean swapped = false;
 		long startTime = System.currentTimeMillis();
-		for (int i = 0; i < r; i++) {
-			sourceGraph = this.source.get(i);
-			for (int j = 0; j < c; j++) {
-				if (!(i == 0 && j == 1)) {
-					continue;
+		int i = 0;
+		int j = 1;
+		// for (int i = 0; i < r; i++) {
+		sourceGraph = this.source.get(i);
+			// for (int j = 0; j < c; j++) {
+				// if (!(i == 0 && j == 1)) {
+					// continue;
+				// }
+		swapped = false;
+		targetGraph = this.target.get(j);
+		this.counter++;
+		// System.out.print("\r"+counter+"/"+numOfMatchings+" ("+sourceGraph.size()+"vs"+targetGraph.size()+")    ");
+		System.out.print("\r"+i+"/"+j+" ("+sourceGraph.size()+"vs"+targetGraph.size()+")    ");
+		// log the current graphs on the console
+		if (this.outputGraphs == 1) {
+			System.out.println("The Source Graph:");
+			System.out.println(sourceGraph);
+			System.out.println("\n\nThe Target Graph:");
+			System.out.println(targetGraph);
+		}
+		// if both graphs are empty the distance is zero and no computations have to be carried out!
+		if (this.sourceGraph.size()<1 && this.targetGraph.size()<1){
+			d = 0;
+		} else {
+			// calculate the approximated or exact edit-distance using tree search algorithms 
+			// AStar: number of open paths during search is unlimited (s=infty)
+			// Beam: number of open paths during search is limited to s
+			if (this.matching.equals("AStar") || this.matching.equals("Beam")){
+				double[] result = this.editDistance.getEditDistance(
+						sourceGraph, targetGraph, costFunction, this.s, Double.MAX_VALUE);
+				d = result[0];
+				lcnt = (int) (result[1]);
+				if (d == -1.00){
+					System.out.println("Fail Nr. "+numOfFails++);
 				}
-				swapped = false;
-				targetGraph = this.target.get(j);
-				this.counter++;
-				// System.out.print("\r"+counter+"/"+numOfMatchings+" ("+sourceGraph.size()+"vs"+targetGraph.size()+")    ");
-				System.out.print("\r"+i+"/"+j+" ("+sourceGraph.size()+"vs"+targetGraph.size()+")    ");
-				// log the current graphs on the console
-				if (this.outputGraphs == 1) {
-					System.out.println("The Source Graph:");
-					System.out.println(sourceGraph);
-					System.out.println("\n\nThe Target Graph:");
-					System.out.println(targetGraph);
-				}
-				// if both graphs are empty the distance is zero and no computations have to be carried out!
-				if (this.sourceGraph.size()<1 && this.targetGraph.size()<1){
-					d = 0;
-				} else {
-					// calculate the approximated or exact edit-distance using tree search algorithms 
-					// AStar: number of open paths during search is unlimited (s=infty)
-					// Beam: number of open paths during search is limited to s
-					if (this.matching.equals("AStar") || this.matching.equals("Beam")){
-						d = this.editDistance.getEditDistance(
-								sourceGraph, targetGraph, costFunction, this.s, Double.MAX_VALUE);
-						if (d == -1.00){
-							System.out.println("Fail Nr. "+numOfFails++);
-						}
-					} else { 
+			} else { 
 
-						// approximation of graph edit distances via bipartite matching
-						// in order to get determinant edit costs between two graphs
-						if (this.sourceGraph.size()<this.targetGraph.size()){
-							this.swapGraphs();
-							swapped= true;
-						}
-
-						// compute the matching using Hungarian or VolgenantJonker (defined in String matching)
-						int[][] matching = null;
-
-
-						// generate the cost-matrix between the local substructures of the source and target graphs
-						costMatrix = this.matrixGenerator.getMatrix(sourceGraph, targetGraph);
-						matching = this.bipartiteMatching.getMatching(costMatrix);
-					
-
-						d = this.editDistance.getEditDistance(sourceGraph,
-								targetGraph, matching, costFunction);
-						
-
-						
-					}
-				}
-				// whether distances or similarities are computed
-				if (this.simKernel < 1){
-					this.distanceMatrix[i][j] = d;
-					//					this.assignmentCostMatrix[i][j] = assignmentCost;
-				} else {
-					switch (this.simKernel){
-					case 1:
-						this.distanceMatrix[i][j] = -Math.pow(d,2.0);break;
-					case 2:
-						this.distanceMatrix[i][j] = -d;break;
-					case 3:
-						this.distanceMatrix[i][j] = Math.tanh(-d);break;
-					case 4:
-						this.distanceMatrix[i][j] = Math.exp(-d);break;
-					}			
-				}
-				if (swapped){
+				// approximation of graph edit distances via bipartite matching
+				// in order to get determinant edit costs between two graphs
+				if (this.sourceGraph.size()<this.targetGraph.size()){
 					this.swapGraphs();
+					swapped= true;
 				}
+
+				// compute the matching using Hungarian or VolgenantJonker (defined in String matching)
+				int[][] matching = null;
+
+
+				// generate the cost-matrix between the local substructures of the source and target graphs
+				costMatrix = this.matrixGenerator.getMatrix(sourceGraph, targetGraph);
+				matching = this.bipartiteMatching.getMatching(costMatrix);
+			
+
+				d = this.editDistance.getEditDistance(sourceGraph,
+						targetGraph, matching, costFunction);
+				
+
+				
 			}
 		}
+		// whether distances or similarities are computed
+		if (this.simKernel < 1){
+			this.distanceMatrix[i][j] = d;
+			//					this.assignmentCostMatrix[i][j] = assignmentCost;
+		} else {
+			switch (this.simKernel){
+			case 1:
+				this.distanceMatrix[i][j] = -Math.pow(d,2.0);break;
+			case 2:
+				this.distanceMatrix[i][j] = -d;break;
+			case 3:
+				this.distanceMatrix[i][j] = Math.tanh(-d);break;
+			case 4:
+				this.distanceMatrix[i][j] = Math.exp(-d);break;
+			}			
+		}
+		if (swapped){
+			this.swapGraphs();
+		}
+			// }
+		// }
 
 		long endingTime = System.currentTimeMillis();
 		long matchingTime = endingTime - startTime;
 		// printing the distances or similarities
 		System.out.println("\nPrinting the results...");
-		this.resultPrinter.printResult(this.distanceMatrix, matchingTime, numOfFails);
+		this.resultPrinter.printResult(this.distanceMatrix, matchingTime, numOfFails, sourceGraph.size(), targetGraph.size(), lcnt);
 		//		this.resultPrinter.printResult(this.distanceMatrix, this.assignmentCostMatrix, matchingTime, numOfFails);
 		System.out.println("Done!");
 	}

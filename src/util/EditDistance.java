@@ -233,9 +233,12 @@ public class EditDistance {
 	 * and graph @param g2 using the cost function @param cf
 	 * s is the maximum number of open paths used in beam-search
 	 */
-	public double getEditDistance(Graph g1, Graph g2, CostFunction cf, int s, double bound) {
+	public double[] getEditDistance(Graph g1, Graph g2, CostFunction cf, int s, double bound) {
+		double[] rtn = new double[2];
 		if (bound <= 0.){
-			return 0;
+			rtn[0] = 0;
+			rtn[1] = -1;
+			return rtn;
 		}
 		// list of partial edit paths (open) organized as TreeSet
 		TreeSet<TreeNode> open = new TreeSet<TreeNode>();
@@ -272,13 +275,17 @@ public class EditDistance {
 //			System.out.println("*** OPEN: \n"+open);
 			eTime = System.currentTimeMillis();
 			if (eTime-sTime > MAX_TIME){
-				return -1; // max time has elapsed
+				rtn[0] = -1;
+				rtn[1] = -1;
+				return rtn; // max time has elapsed
 			}
 			TreeNode u = open.pollFirst(); 
 			if (u.allNodesUsed()){
 				System.out.println("\nEnter loop count " + lcnt);
 				//u.printMatching();
-				return u.getCost();
+				rtn[0] = u.getCost();
+				rtn[1] = lcnt;
+				return rtn;
 			}
 			// generates all successors of node u in the search tree
 			// and add them to open
@@ -294,7 +301,9 @@ public class EditDistance {
 		// error case 
 		System.out.println("***ERROR CASE: Edit Distance is corrupt");
 		System.exit(0);
-		return -1;
+		rtn[0] = -1;
+		rtn[1] = -1;
+		return rtn;
 	}
 
 	public int getMaxCostMatch() {

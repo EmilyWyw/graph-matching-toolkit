@@ -47,7 +47,7 @@ public class ResultPrinter {
 	 * @param matchingTime 
 	 * @param numOfFails 
 	 */
-	public void printResult(double[][] d, long matchingTime, int numOfFails) {
+	public void printResult(double[][] d, long matchingTime, int numOfFails, int g1size, int g2size, double lcnt) {
 		this.decFormat = (DecimalFormat) NumberFormat
 				.getInstance(Locale.ENGLISH);
 		this.decFormat.applyPattern("0.00000");
@@ -158,6 +158,10 @@ public class ResultPrinter {
 				}
 //				out.println();
 			}
+			out.println(g1size);
+			out.println(g2size);
+			out.println(lcnt);
+			
 			
 			out.flush();
 		} catch (FileNotFoundException e) {
